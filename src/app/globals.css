@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+/*
+  BetweenPages design tokens — "Navis Ledger" palette.
+  Warm paper + ink + accent reds, to feel like a book's inside cover.
+  Tailwind v4: declare tokens inside @theme so they become utility classes
+  automatically (bg-primary, text-neutral, font-display, etc.).
+*/
+@theme {
+  --color-primary: #2b2118;        /* deep ink — header, primary text */
+  --color-secondary: #c3512f;      /* burnt sienna — accents, CTAs */
+  --color-tertiary: #d9a441;       /* mustard — highlights, ratings */
+  --color-neutral: #4a4038;        /* body copy */
+  --color-muted: #8a7e72;          /* meta / captions */
+  --color-bg-white: #ffffff;       /* pure white surfaces */
+  --color-bg-100: #f6f0e4;         /* paper */
+  --color-bg-200: #ebe3d2;         /* slightly darker paper — panels */
+  --color-border: #e0d6c1;         /* subtle dividers */
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg-100);
+  color: var(--color-neutral);
+  font-family: var(--font-sans);
+}

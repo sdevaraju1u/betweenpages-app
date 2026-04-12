@@ -1,24 +1,25 @@
 @import "tailwindcss";
 
 /*
-  BetweenPages design tokens — "Navis Ledger" palette.
-  Warm paper + ink + accent reds, to feel like a book's inside cover.
-  Tailwind v4: declare tokens inside @theme so they become utility classes
-  automatically (bg-primary, text-neutral, font-display, etc.).
+  BetweenPages design tokens — "Solarpunk Sanctuary" palette.
+  Parchment base + sage green / terracotta accents. Organic, warm surfaces.
+  A digital garden for book lovers.
 */
 @theme {
-  --color-primary: #2b2118;        /* deep ink — header, primary text */
-  --color-secondary: #c3512f;      /* burnt sienna — accents, CTAs */
-  --color-tertiary: #d9a441;       /* mustard — highlights, ratings */
-  --color-neutral: #4a4038;        /* body copy */
-  --color-muted: #8a7e72;          /* meta / captions */
-  --color-bg-white: #ffffff;       /* pure white surfaces */
-  --color-bg-100: #f6f0e4;         /* paper */
-  --color-bg-200: #ebe3d2;         /* slightly darker paper — panels */
-  --color-border: #e0d6c1;         /* subtle dividers */
+  /* ─── Core palette ─── */
+  --color-primary: #7D907D;
+  --color-primary-hover: #6B7E6B;
+  --color-background: #F9F6F1;
+  --color-surface-solid: #FFFFFF;
+  --color-text: #2D2A26;
+  --color-muted: #9C9689;
+  --color-accent: #E2725B;
+  --color-purple: #C4956A;
+  --color-border: rgba(0, 0, 0, 0.06);
 
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+  /* ─── Typography ─── */
+  --font-display: var(--font-noto-serif), serif;
+  --font-sans: var(--font-outfit), sans-serif;
 }
 
 html,
@@ -27,7 +28,50 @@ body {
 }
 
 body {
-  background: var(--color-bg-100);
-  color: var(--color-neutral);
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: var(--font-sans);
+}
+
+/* ─── Utility classes for frosted surfaces + warm accents ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.gradient-brand {
+  background: linear-gradient(135deg, #7D907D 0%, #E2725B 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #7D907D 0%, #C4956A 50%, #E2725B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-neon-pink {
+  box-shadow: 0 8px 32px rgba(125, 144, 125, 0.2);
+}
+
+.shadow-neon-pink-hover {
+  box-shadow: 0 12px 40px rgba(125, 144, 125, 0.3);
+}
+
+.shadow-neon-cyan {
+  box-shadow: 0 8px 32px rgba(226, 114, 91, 0.15);
+}
+
+.glow-input:focus-within {
+  box-shadow: 0 0 24px rgba(125, 144, 125, 0.2);
+  border-color: rgba(125, 144, 125, 0.4);
 }

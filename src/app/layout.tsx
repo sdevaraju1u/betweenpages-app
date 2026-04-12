@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Manrope, Inter } from "next/font/google";
+import { Noto_Serif, Outfit } from "next/font/google";
+import Providers from "./Providers";
 import "./globals.css";
 
-// Manrope = display font (headings, logo, section titles).
-// Inter = body font (paragraphs, UI chrome).
-// Both load as CSS variables so Tailwind's @theme can reference them.
-const manrope = Manrope({
-  variable: "--font-manrope",
+// Noto Serif = display font (headings, logo). Warm, literary, organic.
+// Outfit = body font (paragraphs, UI text). Geometric, soft, highly legible.
+const notoSerif = Noto_Serif({
+  variable: "--font-noto-serif",
   subsets: ["latin"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
   display: "swap",
 });
@@ -30,9 +30,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+      className={`${notoSerif.variable} ${outfit.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

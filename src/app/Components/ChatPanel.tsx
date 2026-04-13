@@ -1,15 +1,21 @@
 import ChatContainer from "./ChatContainer";
 
-type ChatPanelProps = {
-  moodChips: string[];
+type BookContext = {
+  title: string;
+  author: string;
+  description?: string;
 };
 
-export default function ChatPanel({ moodChips }: ChatPanelProps) {
+type ChatPanelProps = {
+  moodChips: string[];
+  bookContext?: BookContext;
+};
+
+// ChatPanel — thin wrapper. Passes bookContext for scoped chat.
+export default function ChatPanel({ moodChips, bookContext }: ChatPanelProps) {
   return (
     <section className="flex-1 flex flex-col min-h-0 bg-background">
-      <div className="flex-1 flex flex-col min-h-0 w-full max-w-[800px] mx-auto">
-        <ChatContainer moodChips={moodChips} />
-      </div>
+      <ChatContainer moodChips={moodChips} bookContext={bookContext} />
     </section>
   );
 }

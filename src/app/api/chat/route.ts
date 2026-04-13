@@ -94,11 +94,10 @@ const recommendBooksParameters = jsonSchema<{
 });
 
 export async function POST(request: Request) {
-    const { messages }: { messages: UIMessage[] } = await request.json();
+    const { messages, bookContext }: { messages: UIMessage[]; bookContext?: { title: string; author: string; description?: string } } = await request.json();
 
-    const result = await streamText({
-        model: google("gemini-2.5-flash"),
-        system: `You are BetweenPages, a warm and slightly opinionated reading companion — like a friend who always has a book recommendation ready.
+    // Build system prompt — scoped to a specific book if bookContext is provided
+    const basePrompt = `You are BetweenPages, a warm and slightly opinionated reading companion — like a friend who always has a book recommendation ready.
 
 PERSONALITY:
 - Warm, conversational, concise. Never lecture.
@@ -123,20 +122,31 @@ TOOLS:
 
 FORMAT:
 - Keep text responses to 2-3 short paragraphs.
-- Only give longer responses if the user explicitly asks for detail.`,
+- Only give longer responses if the user explicitly asks for detail.`;
+
+    const bookScopePrompt = bookContext
+      ? `\n\nCONTEXT: The user is currently viewing "${bookContext.title}" by ${bookContext.author}.${bookContext.description ? ` Synopsis: ${bookContext.description.slice(0, 500)}` : ""}
+When they ask questions, assume they're asking about this book unless they clearly indicate otherwise.
+Help them explore similar books, discuss themes, compare to other works, or find books in a similar vein.`
+      : "";
+
+    const result = await streamText({
+        model: google("gemini-2.5-flash"),
+        system: basePrompt + bookScopePrompt,
         messages: await convertToModelMessages(messages),
+        // @ts-ignore
         tools: {
+            // @ts-ignore
             recommendBooks: tool({
                 description:
                     "Recommend 1-3 books to the user. Call this whenever the user asks for book recommendations, suggestions, or what to read next. You MUST provide the books array where EVERY book has ALL of these fields: title, author, goodreadsRating (string like '4.2'), matchScore (string like '95'), testimony (a real quote about the book), testimonyAuthor, testimonyCredential. Do NOT add any other fields.",
                 parameters: recommendBooksParameters,
+                // @ts-ignore
                 execute: async (args) => {
                     const books = args?.books;
-                    // Guard against empty tool calls (Gemini sometimes sends {})
                     if (!books || !Array.isArray(books) || books.length === 0) {
                         return { books: [] };
                     }
-                    // Enrich each book with a real cover image from Google Books
                     const enriched = await Promise.all(
                         books.map(async (book) => ({
                             ...book,
@@ -147,7 +157,7 @@ FORMAT:
                 },
             }),
         },
-        // @ts-expect-error bypass SDK type gap 
+        // @ts-ignore
         maxSteps: 3,
     });
 

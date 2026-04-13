@@ -15,110 +15,104 @@ type BookResult = {
   coverUrl?: string | null;
 };
 
-type ChatContainerProps = {
-  moodChips: string[];
+type BookContext = {
+  title: string;
+  author: string;
+  description?: string;
 };
 
-// Rotating earthy cover colors for recommended books (fallback when no image)
-const coverColors = ["#7D907D", "#E2725B", "#C4956A", "#8BA58B", "#D4926D"];
+type ChatContainerProps = {
+  moodChips: string[];
+  bookContext?: BookContext;
+};
 
-/* Demo book cards shown in the welcome state */
-const featuredBooks = [
-  {
-    title: "Neuromancer",
-    author: "William Gibson",
-    coverColor: "#7D907D",
-    goodreadsRating: "3.9",
-    matchScore: "97",
-    testimony:
-      "The book that invented cyberpunk. Still feels like it was written tomorrow.",
-    testimonyAuthor: "Neil Gaiman",
-    testimonyCredential: "Author",
-  },
-  {
-    title: "Klara and the Sun",
-    author: "Kazuo Ishiguro",
-    coverColor: "#E2725B",
-    goodreadsRating: "3.8",
-    matchScore: "94",
-    testimony:
-      "Ishiguro at his most moving. A quiet masterpiece about what it means to love.",
-    testimonyAuthor: "Parul Sehgal",
-    testimonyCredential: "The New York Times",
-  },
-  {
-    title: "Project Hail Mary",
-    author: "Andy Weir",
-    coverColor: "#C4956A",
-    goodreadsRating: "4.5",
-    matchScore: "92",
-    testimony:
-      "I stayed up until 3 AM. Couldn't stop. Best sci-fi I've read in years.",
-    testimonyAuthor: "Sarah K.",
-    testimonyCredential: "Goodreads Reviewer ★★★★★",
-  },
-];
+// Earthy cover colors — sage, terracotta, gold, muted olive, warm clay
+const coverColors = ["#4E604F", "#9F402D", "#7A542E", "#677967", "#966C44"];
 
-export default function ChatContainer({ moodChips }: ChatContainerProps) {
+
+export default function ChatContainer({ moodChips, bookContext }: ChatContainerProps) {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
 
   const isLoading = status === "submitted" || status === "streaming";
 
-  console.log(messages)
-
   function submit(text: string) {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
-    sendMessage({ text: trimmed });
+    // Pass bookContext as extra body data with each message (second arg = ChatRequestOptions)
+    sendMessage(
+      { text: trimmed },
+      bookContext ? { body: { bookContext } } : undefined
+    );
     setInput("");
   }
 
   return (
     <>
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-8 space-y-6">
-        {messages.length === 0 && (
-          <div className="space-y-10">
-            {/* Welcome */}
-            <div className="text-center py-8">
-              <h1 className="font-display text-5xl font-medium">
+      <div className="flex-1 overflow-y-auto px-6 py-10 space-y-6">
+        {messages.length === 0 && !bookContext && (
+          <div className="space-y-12">
+            {/* Welcome — display-lg headline, tight tracking */}
+            <div className="text-center py-10">
+              <h1 className="font-display text-[3.5rem] font-medium leading-[1.1] tracking-[-0.02em]">
                 <span className="text-gradient">Welcome to</span>
-                <span className="text-text"> the Sanctuary.</span>
+                <br />
+                <span className="text-on-surface">the Sanctuary.</span>
               </h1>
-              <p className="text-base text-muted mt-3">
+              <p className="text-lg text-muted mt-4 max-w-md mx-auto">
                 Tell me a genre, a mood, or pick a path below.
               </p>
             </div>
 
-            {/* Mood chips */}
+            {/* Mood chips — pebble-shaped, tonal surfaces */}
             <div className="flex flex-wrap justify-center gap-3">
               {moodChips.map((chip) => (
                 <button
                   key={chip}
                   onClick={() => submit(chip)}
-                  className="px-5 py-2.5 rounded-[100px] glass text-sm text-text font-medium
-                    hover:-translate-y-1 hover:border-primary/40 hover:shadow-neon-pink
-                    active:scale-95 transition-all duration-200"
+                  className="px-6 py-3 pebble-chip text-sm text-on-surface font-medium
+                    bg-surface-container-low hover:bg-surface-container
+                    active:scale-[0.98] transition-all duration-200"
                 >
                   {chip}
                 </button>
               ))}
             </div>
+          </div>
+        )}
 
-            {/* Staff picks divider */}
-            <div className="flex items-center gap-4 pt-2">
-              <div className="flex-1 border-t border-black/[0.06]" />
-              <span className="text-xs text-muted uppercase tracking-[3px] font-display font-semibold">
-                Staff picks
-              </span>
-              <div className="flex-1 border-t border-black/[0.06]" />
+        {/* Book-scoped empty state */}
+        {messages.length === 0 && bookContext && (
+          <div className="space-y-8 animate-fade-up">
+            <div className="text-center py-8">
+              <p className="text-sm text-muted uppercase tracking-[2px] font-medium">
+                Discussing
+              </p>
+              <h2 className="font-display text-2xl font-medium text-on-surface mt-2 tracking-[-0.01em]">
+                {bookContext.title}
+              </h2>
+              <p className="text-muted mt-1">{bookContext.author}</p>
             </div>
 
-            {/* Demo book cards */}
-            <div className="flex flex-wrap gap-4 justify-center">
-              {featuredBooks.map((book) => (
-                <BookCard key={book.title} {...book} />
+            {/* Contextual quick prompts */}
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {[
+                "What is this book about?",
+                "Who should read this?",
+                "Similar books?",
+                "Key themes",
+                "Is it worth reading?",
+              ].map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => submit(prompt)}
+                  className="px-5 py-2.5 rounded-full text-sm text-on-surface-variant font-medium
+                    bg-surface-container-low hover:bg-surface-container
+                    active:scale-[0.98] transition-all duration-200"
+                >
+                  {prompt}
+                </button>
               ))}
             </div>
           </div>
@@ -128,7 +122,6 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
         {messages.map((m) => (
           <div key={m.id} className="space-y-4">
             {m.parts.map((part, i) => {
-              // Regular text → ChatMessage bubble
               if (part.type === "text" && part.text.trim()) {
                 return (
                   <ChatMessage
@@ -141,8 +134,6 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
               }
 
               // Tool invocation → BookCards
-              // AI SDK v6 without typed tools: part.type is "dynamic-tool"
-              // Tool name is in part.toolName, state is "output-available"
               if (
                 part.type === "tool-recommendBooks" &&
                 "state" in part &&
@@ -151,7 +142,7 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
                 const { books } = (part as { output: { books: BookResult[] } }).output;
                 if (!books || books.length === 0) return null;
                 return (
-                  <div key={i} className="flex flex-wrap gap-4 justify-center">
+                  <div key={i} className="flex flex-wrap gap-6 justify-center">
                     {books.map((book, j) => (
                       <BookCard
                         key={`${book.title}-${j}`}
@@ -177,11 +168,11 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
 
         {isLoading &&
           messages[messages.length - 1]?.role === "user" && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 pl-2">
               <div className="flex gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 rounded-full bg-purple animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-accent animate-bounce [animation-delay:300ms]" />
+                <span className="w-2 h-2 rounded-full bg-tertiary animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-secondary animate-bounce [animation-delay:300ms]" />
               </div>
               <p className="text-sm text-muted">
                 Finding your next obsession…
@@ -190,19 +181,19 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
           )}
       </div>
 
-      {/* Input */}
+      {/* Input — translucent glass bar, fixed bottom feel */}
       <div className="px-6 pb-6 pt-3 shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             submit(input);
           }}
-          className="flex items-center gap-3 glass rounded-[100px] px-5 py-2 glow-input transition-all duration-300"
+          className="flex items-center gap-3 glass rounded-full px-5 py-2 glow-input transition-all duration-300"
         >
           <input
             type="text"
-            placeholder="Ask about a book, a mood, an author…"
-            className="flex-1 bg-transparent text-[15px] text-text placeholder:text-muted focus:outline-none"
+            placeholder={bookContext ? `Ask about ${bookContext.title}…` : "Ask about a book, a mood, an author…"}
+            className="flex-1 bg-transparent text-[15px] text-on-surface placeholder:text-muted focus:outline-none font-display"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
@@ -210,8 +201,9 @@ export default function ChatContainer({ moodChips }: ChatContainerProps) {
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="w-11 h-11 rounded-full gradient-brand text-white flex items-center justify-center
-              shadow-neon-pink hover:shadow-neon-pink-hover hover:scale-105
+            className="w-11 h-11 rounded-full gradient-brand text-on-primary flex items-center justify-center
+              shadow-ambient hover:shadow-ambient-hover hover:scale-[1.02]
+              active:scale-[0.98] active:shadow-none
               disabled:opacity-30 transition-all duration-200"
           >
             <svg

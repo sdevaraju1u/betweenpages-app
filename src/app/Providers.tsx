@@ -1,20 +1,33 @@
 "use client";
 
 // Providers — client component wrapper for layout.tsx.
-//
-// WHY THIS FILE EXISTS:
-// layout.tsx is a Server Component (no "use client" directive).
-// AuthProvider uses useState/useEffect, so it's a Client Component.
-// Server Components can't directly render Client Components that use hooks.
-// Solution: wrap all client-side providers in one "Providers" component,
-// and render <Providers> inside layout.tsx.
-//
-// If you add more providers later (e.g., ThemeProvider, QueryClientProvider),
-// nest them here.
+// Nests all client-side providers: React Query, Auth, BookContext.
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import { AuthProvider } from "@/lib/firebase/AuthContext";
+import { BookContextProvider } from "@/lib/context/BookContext";
 import type { ReactNode } from "react";
 
 export default function Providers({ children }: { children: ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  // Create QueryClient once per component lifetime (not on every render)
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: 2,
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BookContextProvider>{children}</BookContextProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }

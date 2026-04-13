@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Noto_Serif, Outfit } from "next/font/google";
+import { Noto_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import Providers from "./Providers";
 import "./globals.css";
 
-// Noto Serif = display font (headings, logo). Warm, literary, organic.
-// Outfit = body font (paragraphs, UI text). Geometric, soft, highly legible.
+// Noto Serif = display font (headings, logo). The authoritative "voice" of the system.
+// Plus Jakarta Sans = body font (paragraphs, labels). Modern, legible, functional layer.
 const notoSerif = Noto_Serif({
   variable: "--font-noto-serif",
   subsets: ["latin"],
   display: "swap",
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
   display: "swap",
 });
@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${notoSerif.variable} ${outfit.variable} h-full antialiased`}
+      className={`${notoSerif.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

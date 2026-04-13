@@ -1,3 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 type BookCardProps = {
   title: string;
   author: string;
@@ -10,6 +14,15 @@ type BookCardProps = {
   testimonyCredential: string;
 };
 
+// Generate a slug ID from title (same logic as the seed script)
+function toSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+}
+
 export default function BookCard({
   title,
   author,
@@ -21,16 +34,19 @@ export default function BookCard({
   testimonyAuthor,
   testimonyCredential,
 }: BookCardProps) {
+  const router = useRouter();
+
+  function handleClick() {
+    router.push(`/book/${toSlug(title)}`);
+  }
+
   return (
     <div
+      onClick={handleClick}
       className="rounded-[24px] overflow-hidden max-w-[320px] mx-auto
-        shadow-[0_4px_24px_rgba(125,144,125,0.15),0_1px_4px_rgba(0,0,0,0.06)]
-        hover:shadow-[0_8px_32px_rgba(125,144,125,0.25),0_2px_8px_rgba(0,0,0,0.08)]
-        transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
-      style={{
-        background: "rgba(255, 255, 255, 0.9)",
-        border: "1px solid rgba(0, 0, 0, 0.06)",
-      }}
+        bg-surface-container-lowest border border-outline-variant
+        shadow-ambient hover:shadow-ambient-hover
+        transition-all duration-400 hover:-translate-y-1 cursor-pointer group"
     >
       {/* Cover image section */}
       <div className="relative w-full aspect-[3/4] overflow-hidden">
@@ -46,7 +62,7 @@ export default function BookCard({
             style={{ backgroundColor: coverColor }}
           >
             <div className="text-center">
-              <p className="font-display text-xl font-bold text-white/90 leading-tight">
+              <p className="font-display text-xl font-medium text-white/90 leading-tight">
                 {title}
               </p>
               <p className="text-sm text-white/70 mt-2">{author}</p>
@@ -54,15 +70,15 @@ export default function BookCard({
           </div>
         )}
 
-        {/* Gradient overlay on cover for text readability */}
+        {/* Gradient overlay for text readability */}
         {coverUrl && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         )}
 
         {/* Title + Author overlaid on cover */}
         {coverUrl && (
-          <div className="absolute bottom-3 left-4 right-16">
-            <h3 className="font-display text-lg font-bold text-white leading-tight drop-shadow-lg">
+          <div className="absolute bottom-3 left-5 right-16">
+            <h3 className="font-display text-lg font-medium text-white leading-tight drop-shadow-lg">
               {title}
             </h3>
             <p className="text-sm text-white/80 mt-0.5 drop-shadow-lg">
@@ -71,13 +87,16 @@ export default function BookCard({
           </div>
         )}
 
-        {/* Match score badge — overlaid on bottom-right of cover */}
+        {/* Match score badge */}
         <div
           className="absolute bottom-3 right-3 w-14 h-14 rounded-full flex flex-col items-center justify-center
-            border-2 border-accent/60 shadow-[0_0_12px_rgba(226,114,91,0.25)]"
-          style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}
+            shadow-warm"
+          style={{
+            background: "rgba(252, 249, 244, 0.9)",
+            backdropFilter: "blur(8px)",
+          }}
         >
-          <span className="text-accent font-bold text-sm leading-none">
+          <span className="text-secondary font-bold text-sm leading-none">
             {matchScore}%
           </span>
           <span className="text-[9px] text-muted leading-none mt-0.5">
@@ -88,25 +107,24 @@ export default function BookCard({
 
       {/* Info section below cover */}
       <div className="px-5 pt-4 pb-5">
-        {/* Title + Author (below cover) */}
-        <h3 className="font-display text-lg font-bold text-text leading-tight">
+        <h3 className="font-display text-lg font-medium text-on-surface leading-tight">
           {title}
         </h3>
         <p className="text-sm text-muted mt-0.5">{author}</p>
 
         {/* Goodreads rating */}
         <div className="flex items-center gap-1.5 mt-3">
-          <span className="text-accent text-sm">&#9733;</span>
-          <span className="text-text font-medium text-sm">{goodreadsRating}</span>
+          <span className="text-secondary text-sm">&#9733;</span>
+          <span className="text-on-surface font-medium text-sm">{goodreadsRating}</span>
           <span className="text-muted text-xs">Goodreads</span>
         </div>
 
         {/* Testimony */}
-        <div className="border-t border-black/[0.06] pt-3 mt-3">
-          <p className="text-sm italic text-text/70 leading-relaxed">
+        <div className="pt-4 mt-4">
+          <p className="text-sm italic text-on-surface-variant leading-relaxed">
             &ldquo;{testimony}&rdquo;
           </p>
-          <p className="text-xs text-muted mt-1.5">
+          <p className="text-xs text-muted mt-2">
             &mdash; {testimonyAuthor}, {testimonyCredential}
           </p>
         </div>

@@ -55,11 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe; // cleanup on unmount
   }, []);
 
-  // Sign in with Google popup
+  // Sign in with Google popup, then redirect to landing page
   async function signIn() {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
-    // No need to setUser here — onAuthStateChanged will fire automatically
+    // Always land on the discovery page after login
+    if (window.location.pathname !== "/") {
+      window.location.href = "/";
+    }
   }
 
   // Sign out

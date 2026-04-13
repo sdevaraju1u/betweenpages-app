@@ -1,25 +1,48 @@
 @import "tailwindcss";
 
 /*
-  BetweenPages design tokens — "Solarpunk Sanctuary" palette.
-  Parchment base + sage green / terracotta accents. Organic, warm surfaces.
-  A digital garden for book lovers.
+  BetweenPages design tokens — "High-End Solarpunk Editorial"
+  The Digital Atheneum: tactile, editorial, alive.
+  No 1px borders. No pure black. Tonal layering over drop shadows.
+  Pebble containers. Breathing room. Light on natural materials.
 */
 @theme {
-  /* ─── Core palette ─── */
-  --color-primary: #7D907D;
-  --color-primary-hover: #6B7E6B;
-  --color-background: #F9F6F1;
-  --color-surface-solid: #FFFFFF;
-  --color-text: #2D2A26;
-  --color-muted: #9C9689;
-  --color-accent: #E2725B;
-  --color-purple: #C4956A;
-  --color-border: rgba(0, 0, 0, 0.06);
+  /* ─── Core palette (Material Design 3 logic) ─── */
+  --color-primary: #4E604F;
+  --color-primary-container: #677967;
+  --color-primary-hover: #3D4E3E;
+  --color-on-primary: #FFFFFF;
+
+  --color-secondary: #9F402D;
+  --color-secondary-container: #FD876F;
+
+  --color-tertiary: #7A542E;
+  --color-tertiary-container: #966C44;
+
+  /* ─── Surfaces (tonal layering, no borders) ─── */
+  --color-background: #FCF9F4;
+  --color-surface: #F7F3ED;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-low: #F5F1EB;
+  --color-surface-container: #EFE9E1;
+  --color-surface-container-high: #E8E2D9;
+  --color-surface-container-highest: #E0D9CF;
+
+  /* ─── Text ─── */
+  --color-text: #1C1C19;
+  --color-on-surface: #1C1C19;
+  --color-on-surface-variant: #48473F;
+  --color-muted: #78766D;
+  --color-outline: rgba(28, 28, 25, 0.12);
+  --color-outline-variant: rgba(28, 28, 25, 0.06);
+
+  /* ─── Legacy aliases (so existing classes still work) ─── */
+  --color-accent: #9F402D;
+  --color-border: rgba(28, 28, 25, 0.06);
 
   /* ─── Typography ─── */
   --font-display: var(--font-noto-serif), serif;
-  --font-sans: var(--font-outfit), sans-serif;
+  --font-sans: var(--font-plus-jakarta-sans), sans-serif;
 }
 
 html,
@@ -33,45 +56,124 @@ body {
   font-family: var(--font-sans);
 }
 
-/* ─── Utility classes for frosted surfaces + warm accents ─── */
+/* ─── Glass surfaces (for floating elements only: chat bar, modals) ─── */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(252, 249, 244, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(252, 249, 244, 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
 }
 
+/* ─── Brand gradient (primary → primary-container, pillowed 3D feel) ─── */
 .gradient-brand {
-  background: linear-gradient(135deg, #7D907D 0%, #E2725B 100%);
+  background: radial-gradient(ellipse at 30% 30%, #677967 0%, #4E604F 100%);
 }
 
+/* ─── Text gradient (sage → gold → terracotta) ─── */
 .text-gradient {
-  background: linear-gradient(135deg, #7D907D 0%, #C4956A 50%, #E2725B 100%);
+  background: linear-gradient(135deg, #4E604F 0%, #7A542E 50%, #9F402D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.shadow-neon-pink {
-  box-shadow: 0 8px 32px rgba(125, 144, 125, 0.2);
+/* ─── Ambient shadows (tinted with primary, never pure black) ─── */
+.shadow-ambient {
+  box-shadow: 0 8px 40px rgba(15, 31, 18, 0.05);
 }
 
-.shadow-neon-pink-hover {
-  box-shadow: 0 12px 40px rgba(125, 144, 125, 0.3);
+.shadow-ambient-hover {
+  box-shadow: 0 12px 48px rgba(15, 31, 18, 0.08);
 }
 
-.shadow-neon-cyan {
-  box-shadow: 0 8px 32px rgba(226, 114, 91, 0.15);
+.shadow-warm {
+  box-shadow: 0 8px 40px rgba(122, 84, 46, 0.06);
 }
 
+/* ─── Legacy shadow names (so existing classes still compile) ─── */
+.shadow-neon-pink { box-shadow: 0 8px 40px rgba(15, 31, 18, 0.05); }
+.shadow-neon-pink-hover { box-shadow: 0 12px 48px rgba(15, 31, 18, 0.08); }
+
+/* ─── Input glow (subtle sage warmth on focus) ─── */
 .glow-input:focus-within {
-  box-shadow: 0 0 24px rgba(125, 144, 125, 0.2);
-  border-color: rgba(125, 144, 125, 0.4);
+  box-shadow: 0 0 0 3px rgba(78, 96, 79, 0.12);
+}
+
+/* ─── Pebble containers (the signature organic shape) ─── */
+.pebble {
+  border-radius: 60% 40% 50% 50% / 50% 50% 60% 40%;
+  transition: border-radius 0.4s ease;
+}
+
+.pebble:hover {
+  border-radius: 50% 60% 40% 50% / 60% 40% 50% 50%;
+}
+
+/* ─── Pebble chip (for mood/genre selectors) ─── */
+.pebble-chip {
+  border-radius: 50% 45% 55% 45% / 45% 55% 45% 55%;
+  transition: all 0.3s ease;
+}
+
+.pebble-chip:hover {
+  border-radius: 45% 55% 45% 55% / 55% 45% 55% 45%;
+  transform: translateY(-2px);
+}
+
+/* ─── Ghost border (whisper of a container, 15% opacity) ─── */
+.ghost-border {
+  box-shadow: inset 0 0 0 1px rgba(28, 28, 25, 0.06);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInFromLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease; }
+.animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-left { animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-right { animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-from-left { animation: slideInFromLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes sheetUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes snackbarIn {
+  from { opacity: 0; transform: translateY(16px) translateX(-50%); }
+  to { opacity: 1; transform: translateY(0) translateX(-50%); }
 }

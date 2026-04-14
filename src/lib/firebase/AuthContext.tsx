@@ -1,13 +1,8 @@
 "use client";
 
 // AuthContext — provides auth state to the entire app.
-//
-// HOW IT WORKS:
-// 1. AuthProvider mounts → sets up onAuthStateChanged listener
-// 2. Listener fires immediately (checks if user has a cached session)
-// 3. Listener fires again whenever user signs in or out
-// 4. We store the user in React state → triggers re-render everywhere
-// 5. Any component calls useAuth() to get { user, loading, signIn, signOut }
+// Uses signInWithPopup on desktop and signInWithRedirect on mobile (iOS Safari
+// doesn't support popups properly due to storage partitioning).
 
 import {
   createContext,
@@ -19,56 +14,70 @@ import {
 import {
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
+  browserPopupRedirectResolver,
   type User,
 } from "firebase/auth";
 import { auth } from "./config";
 
-// --- Types ---
 type AuthContextValue = {
-  user: User | null; // null = not logged in
-  loading: boolean; // true while checking cached session on page load
-  signIn: () => Promise<void>; // opens Google popup
-  signOut: () => Promise<void>; // logs out
+  user: User | null;
+  loading: boolean;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
-// --- Context ---
-// Default value is only used if a component reads useAuth() outside of AuthProvider.
-// We throw an error instead (see useAuth below).
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// --- Provider ---
-// Wrap your app with this in layout.tsx:
-//   <AuthProvider>{children}</AuthProvider>
+/** Detect mobile / popup-unfriendly browsers. */
+function isMobileBrowser(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  // iOS (iPhone, iPad, iPod) or Android mobile
+  return /iPhone|iPad|iPod|Android/i.test(ua);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // start true, flip to false once we know
+  const [loading, setLoading] = useState(true);
 
-  // Set up the auth state listener on mount.
-  // onAuthStateChanged returns an unsubscribe function — we call it on unmount.
   useEffect(() => {
+    // Handle redirect result (from signInWithRedirect on mobile)
+    // Must be called ONCE on page load. No-op if no redirect happened.
+    getRedirectResult(auth, browserPopupRedirectResolver)
+      .catch((err) => {
+        // Swallow — if this fails, the onAuthStateChanged listener still works
+        console.warn("Redirect result error (safe to ignore if not redirecting):", err);
+      });
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
     });
-    return unsubscribe; // cleanup on unmount
+    return unsubscribe;
   }, []);
 
-  // Sign in with Google popup, then redirect to landing page
   async function signIn() {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    // Always land on the discovery page after login
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
+
+    if (isMobileBrowser()) {
+      // Mobile: redirect (page will reload after sign-in)
+      await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
+      // signInWithRedirect navigates away — nothing below here runs
+    } else {
+      // Desktop: popup
+      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
     }
   }
 
-  // Sign out
   async function signOut() {
     await firebaseSignOut(auth);
-    // No need to setUser(null) — onAuthStateChanged will fire automatically
   }
 
   return (
@@ -78,9 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// --- Hook ---
-// Components call this to access auth state:
-//   const { user, loading, signIn, signOut } = useAuth();
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

@@ -10,7 +10,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build-time env vars (NEXT_PUBLIC_ must be present at build time for client-side bundling)
+# NEXT_PUBLIC_ vars must be present at build time (baked into client JS bundle).
+# Firebase client config is NOT secret — it's a project identifier visible in every browser.
+# Real security is enforced by Firestore Security Rules + Firebase Auth.
 ENV NEXT_PUBLIC_FIREBASE_API_KEY=""
 ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=betweenpages-a658a.firebaseapp.com
 ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID=betweenpages-a658a

@@ -42,16 +42,60 @@ export const LANGUAGES = [
 ] as const;
 
 export const COUNTRIES = [
+  // Asia
   { code: "IN", label: "India", flag: "🇮🇳" },
+  { code: "JP", label: "Japan", flag: "🇯🇵" },
+  { code: "KR", label: "South Korea", flag: "🇰🇷" },
+  { code: "CN", label: "China", flag: "🇨🇳" },
+  { code: "SG", label: "Singapore", flag: "🇸🇬" },
+  { code: "PH", label: "Philippines", flag: "🇵🇭" },
+  { code: "ID", label: "Indonesia", flag: "🇮🇩" },
+  { code: "TH", label: "Thailand", flag: "🇹🇭" },
+  { code: "MY", label: "Malaysia", flag: "🇲🇾" },
+  { code: "VN", label: "Vietnam", flag: "🇻🇳" },
+  { code: "PK", label: "Pakistan", flag: "🇵🇰" },
+  { code: "BD", label: "Bangladesh", flag: "🇧🇩" },
+  // Americas
   { code: "US", label: "USA", flag: "🇺🇸" },
-  { code: "GB", label: "UK", flag: "🇬🇧" },
   { code: "CA", label: "Canada", flag: "🇨🇦" },
-  { code: "AU", label: "Australia", flag: "🇦🇺" },
+  { code: "MX", label: "Mexico", flag: "🇲🇽" },
+  { code: "BR", label: "Brazil", flag: "🇧🇷" },
+  { code: "AR", label: "Argentina", flag: "🇦🇷" },
+  { code: "CO", label: "Colombia", flag: "🇨🇴" },
+  { code: "CL", label: "Chile", flag: "🇨🇱" },
+  // Europe
+  { code: "GB", label: "UK", flag: "🇬🇧" },
   { code: "DE", label: "Germany", flag: "🇩🇪" },
   { code: "FR", label: "France", flag: "🇫🇷" },
-  { code: "JP", label: "Japan", flag: "🇯🇵" },
-  { code: "BR", label: "Brazil", flag: "🇧🇷" },
-  { code: "KR", label: "South Korea", flag: "🇰🇷" },
+  { code: "ES", label: "Spain", flag: "🇪🇸" },
+  { code: "IT", label: "Italy", flag: "🇮🇹" },
+  { code: "NL", label: "Netherlands", flag: "🇳🇱" },
+  { code: "SE", label: "Sweden", flag: "🇸🇪" },
+  { code: "NO", label: "Norway", flag: "🇳🇴" },
+  { code: "DK", label: "Denmark", flag: "🇩🇰" },
+  { code: "PL", label: "Poland", flag: "🇵🇱" },
+  { code: "PT", label: "Portugal", flag: "🇵🇹" },
+  { code: "CH", label: "Switzerland", flag: "🇨🇭" },
+  { code: "BE", label: "Belgium", flag: "🇧🇪" },
+  { code: "IE", label: "Ireland", flag: "🇮🇪" },
+  { code: "RU", label: "Russia", flag: "🇷🇺" },
+  { code: "UA", label: "Ukraine", flag: "🇺🇦" },
+  { code: "CZ", label: "Czech Republic", flag: "🇨🇿" },
+  { code: "AT", label: "Austria", flag: "🇦🇹" },
+  // Africa
+  { code: "NG", label: "Nigeria", flag: "🇳🇬" },
+  { code: "ZA", label: "South Africa", flag: "🇿🇦" },
+  { code: "KE", label: "Kenya", flag: "🇰🇪" },
+  { code: "EG", label: "Egypt", flag: "🇪🇬" },
+  { code: "GH", label: "Ghana", flag: "🇬🇭" },
+  // Middle East
+  { code: "AE", label: "UAE", flag: "🇦🇪" },
+  { code: "SA", label: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "IL", label: "Israel", flag: "🇮🇱" },
+  { code: "TR", label: "Turkey", flag: "🇹🇷" },
+  // Oceania
+  { code: "AU", label: "Australia", flag: "🇦🇺" },
+  { code: "NZ", label: "New Zealand", flag: "🇳🇿" },
 ] as const;
 
 export const BOOK_CLUBS = [

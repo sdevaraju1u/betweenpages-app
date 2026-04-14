@@ -33,7 +33,7 @@ export default function SavedBooksContent() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-10">
+      <div className="px-4 sm:px-8 py-6 sm:py-10">
         <div className="h-8 w-48 bg-surface-container rounded-full animate-pulse mb-8" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
@@ -48,9 +48,9 @@ export default function SavedBooksContent() {
   }
 
   return (
-    <div className="px-8 py-10">
-      <div className="mb-10">
-        <h1 className="font-display text-3xl font-medium text-on-surface tracking-[-0.02em]">My Books</h1>
+    <div className="px-4 sm:px-8 py-6 sm:py-10">
+      <div className="mb-8 sm:mb-10">
+        <h1 className="font-display text-2xl sm:text-3xl font-medium text-on-surface tracking-[-0.02em]">My Books</h1>
         <p className="text-muted mt-1">
           {books.length === 0 ? "Your library is empty." : `${books.length} book${books.length !== 1 ? "s" : ""} saved`}
         </p>

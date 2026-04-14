@@ -1,12 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserPreferences } from "../services/userPreferences";
-import {
-  getChart,
-  getBooksByIds,
-  getChartsByCountries,
-  getBookClub,
-  getBooksByGenre,
-} from "../services/discoveryService";
+import { getBookClub, getBooksByIds, getBooksByGenre } from "../services/discoveryService";
 import type { Book } from "../schemas/firestore";
 
 export type Section = {
@@ -17,14 +11,12 @@ export type Section = {
   showRanks?: boolean;
 };
 
-const FLAGS: Record<string, string> = {
-  IN: "\u{1F1EE}\u{1F1F3}", US: "\u{1F1FA}\u{1F1F8}", GB: "\u{1F1EC}\u{1F1E7}",
-  CA: "\u{1F1E8}\u{1F1E6}", AU: "\u{1F1E6}\u{1F1FA}", DE: "\u{1F1E9}\u{1F1EA}",
-  FR: "\u{1F1EB}\u{1F1F7}", JP: "\u{1F1EF}\u{1F1F5}", BR: "\u{1F1E7}\u{1F1F7}",
-  KR: "\u{1F1F0}\u{1F1F7}",
+export type DiscoveryData = {
+  sections: Section[];
+  followedCountries: string[];
 };
 
-async function fetchDiscoverySections(uid: string): Promise<Section[]> {
+async function fetchDiscoveryData(uid: string): Promise<DiscoveryData> {
   const prefs = await getUserPreferences(uid);
   const sections: Section[] = [];
   const withCovers = (books: Book[]) => books.filter((b) => b.coverUrl);
@@ -38,29 +30,23 @@ async function fetchDiscoverySections(uid: string): Promise<Section[]> {
     }
     const seen = new Set<string>();
     const unique = withCovers(trendingBooks)
-      .filter((b) => { if (seen.has(b.id)) return false; seen.add(b.id); return true; })
+      .filter((b) => {
+        if (seen.has(b.id)) return false;
+        seen.add(b.id);
+        return true;
+      })
       .slice(0, 15);
     if (unique.length > 0) {
-      sections.push({ key: "trending", title: "Trending in your genres", emoji: "\u{1F525}", books: unique });
+      sections.push({
+        key: "trending",
+        title: "Trending in your genres",
+        emoji: "\u{1F525}",
+        books: unique,
+      });
     }
   } catch {}
 
-  // 2. Country charts
-  try {
-    const charts = await getChartsByCountries(prefs.followedCountries);
-    for (const chart of charts) {
-      if (chart.bookIds.length > 0) {
-        const books = withCovers(await getBooksByIds(chart.bookIds.slice(0, 20)));
-        if (books.length > 0) {
-          sections.push({
-            key: `chart-${chart.id}`, title: chart.name,
-            emoji: FLAGS[chart.country || ""] || "\u{1F4CA}",
-            books, showRanks: true,
-          });
-        }
-      }
-    }
-  } catch {}
+  // 2. Country charts are rendered separately by <CountryChartSection> with SSE streaming.
 
   // 3. Book clubs
   try {
@@ -69,7 +55,12 @@ async function fetchDiscoverySections(uid: string): Promise<Section[]> {
       if (club && club.bookIds.length > 0) {
         const books = withCovers(await getBooksByIds(club.bookIds.slice(0, 15)));
         if (books.length > 0) {
-          sections.push({ key: `club-${club.id}`, title: club.name, emoji: club.avatarEmoji, books });
+          sections.push({
+            key: `club-${club.id}`,
+            title: club.name,
+            emoji: club.avatarEmoji,
+            books,
+          });
         }
       }
     }
@@ -80,20 +71,25 @@ async function fetchDiscoverySections(uid: string): Promise<Section[]> {
     for (const genre of prefs.favoriteGenres.slice(0, 4)) {
       const books = withCovers(await getBooksByGenre(genre, 15));
       if (books.length > 0) {
-        sections.push({ key: `genre-${genre}`, title: `Because you love ${genre}`, emoji: "\u{1F4D6}", books });
+        sections.push({
+          key: `genre-${genre}`,
+          title: `Because you love ${genre}`,
+          emoji: "\u{1F4D6}",
+          books,
+        });
       }
     }
   } catch {}
 
-  return sections;
+  return { sections, followedCountries: prefs.followedCountries };
 }
 
-/** Fetches all discovery sections for a user. Cached and invalidated on preference change. */
+/** Fetches non-country discovery sections + followedCountries list for SSE rendering. */
 export function useDiscoverySections(uid: string | undefined) {
   return useQuery({
     queryKey: ["discoverySections", uid],
-    queryFn: () => fetchDiscoverySections(uid!),
+    queryFn: () => fetchDiscoveryData(uid!),
     enabled: !!uid,
-    staleTime: 3 * 60 * 1000, // 3 min
+    staleTime: 3 * 60 * 1000,
   });
 }

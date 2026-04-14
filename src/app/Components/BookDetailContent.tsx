@@ -33,7 +33,7 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
   const description = detail?.description || "";
   const isSaved = detail?.isSaved || false;
 
-  const { data: reviews = [] } = useBookReviews(
+  const { reviews, status: reviewsStatus, message: reviewsMessage } = useBookReviews(
     bookId,
     book?.title || "",
     book?.author || ""
@@ -68,7 +68,7 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
 
   if (isLoading) {
     return (
-      <div className="p-8 space-y-6 animate-pulse">
+      <div className="p-4 sm:p-8 space-y-6 animate-pulse">
         <div className="h-5 w-32 bg-surface-container rounded-full" />
         <div className="w-48 aspect-[2/3] bg-surface-container rounded-2xl mx-auto" />
         <div className="h-8 w-64 bg-surface-container rounded-full" />
@@ -94,7 +94,7 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
       {/* Back button */}
       <button
         onClick={() => router.push("/")}
@@ -109,9 +109,9 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
       {/* Cover */}
       <div className="flex justify-center">
         {book.coverUrl ? (
-          <img src={book.coverUrl} alt={book.title} className="w-56 rounded-2xl shadow-ambient" />
+          <img src={book.coverUrl} alt={book.title} className="w-40 sm:w-56 rounded-2xl shadow-ambient" />
         ) : (
-          <div className="w-56 aspect-[2/3] rounded-2xl flex items-end justify-center p-6" style={{ backgroundColor: "#4E604F" }}>
+          <div className="w-40 sm:w-56 aspect-[2/3] rounded-2xl flex items-end justify-center p-6" style={{ backgroundColor: "#4E604F" }}>
             <p className="font-display text-lg font-medium text-white/90 text-center">{book.title}</p>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
 
       {/* Metadata */}
       <div className="text-center">
-        <h1 className="font-display text-2xl font-medium text-on-surface tracking-[-0.01em]">{book.title}</h1>
+        <h1 className="font-display text-xl sm:text-2xl font-medium text-on-surface tracking-[-0.01em]">{book.title}</h1>
         <p className="text-muted mt-1">{book.author}</p>
         <div className="flex items-center justify-center gap-3 mt-3 text-sm text-muted">
           {book.pageCount && <span>{book.pageCount} pages</span>}
@@ -153,12 +153,21 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
         </div>
       )}
 
-      {/* Reviews */}
-      {reviews.length > 0 && (
+      {/* Reviews — progressive loading with SSE */}
+      {(reviews.length > 0 || reviewsStatus === "generating" || reviewsStatus === "loading") && (
         <div>
           <h2 className="font-display text-lg font-medium text-on-surface mb-4">💬 What readers say</h2>
+
+          {/* Loading message when no reviews yet */}
+          {reviews.length === 0 && (reviewsStatus === "loading" || reviewsStatus === "generating") && (
+            <p className="text-sm text-muted flex items-center gap-2 mb-4">
+              <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+              {reviewsMessage || "Gathering reader reviews..."}
+            </p>
+          )}
+
           <div className="space-y-4">
-            {reviews.map((review) => (
+            {reviews.map((review, i) => (
               <div
                 key={review.id}
                 className="rounded-2xl p-5 bg-surface-container-low"
@@ -168,6 +177,7 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
                     : review.rating <= 2 ? "var(--color-secondary)"
                     : "var(--color-tertiary)"
                   }`,
+                  animation: `fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.08}s both`,
                 }}
               >
                 <div className="flex items-center gap-1 mb-2">
@@ -181,6 +191,14 @@ export default function BookDetailContent({ bookId }: BookDetailContentProps) {
               </div>
             ))}
           </div>
+
+          {/* Subtle indicator if still streaming more */}
+          {reviews.length > 0 && reviewsStatus === "streaming" && (
+            <p className="text-xs text-muted mt-3 flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              More reviews coming...
+            </p>
+          )}
         </div>
       )}
 

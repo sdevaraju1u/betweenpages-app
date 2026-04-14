@@ -1,7 +1,8 @@
 "use client";
 
-// MainShell — the adaptive container.
-// Refactored: uses useUserPreferences hook (React Query) instead of manual useState/useEffect.
+// MainShell — fully responsive adaptive container.
+// Mobile: book detail and chat are tabbed.
+// Desktop: side-by-side split view.
 
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -43,17 +44,17 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showEditPreferences, setShowEditPreferences] = useState(false);
   const [chatExpanded, setChatExpanded] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"book" | "chat">("book");
 
-  // Show onboarding if preferences loaded but not complete
   useEffect(() => {
-    if (preferences && !preferences.onboardingComplete) {
-      setShowOnboarding(true);
-    }
+    if (preferences && !preferences.onboardingComplete) setShowOnboarding(true);
   }, [preferences]);
 
   useEffect(() => {
     if (!isBookDetail) setChatExpanded(false);
-  }, [isBookDetail]);
+    // Reset mobile tab to "book" when navigating to a new book
+    if (isBookDetail) setMobileTab("book");
+  }, [isBookDetail, pathname]);
 
   if (authLoading) return <LoadingDots />;
   if (!user) return <LoginScreen />;
@@ -62,7 +63,6 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
   function handlePrefsComplete() {
     setShowOnboarding(false);
     setShowEditPreferences(false);
-    // React Query auto-invalidates via useSavePreferences hook — no manual refetch needed
   }
 
   const modals = (
@@ -78,17 +78,52 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
     </>
   );
 
-  // ─── Book detail: split layout ───
+  // ─── Book detail: split on desktop, tabs on mobile ───
   if (isBookDetail) {
     return (
       <>
         <AppHeader onEditPreferences={() => setShowEditPreferences(true)} />
         {modals}
+
+        {/* Mobile: tabs */}
+        <div className="flex md:hidden border-b border-outline-variant">
+          <button
+            onClick={() => setMobileTab("book")}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+              mobileTab === "book"
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted"
+            }`}
+          >
+            📖 Book
+          </button>
+          <button
+            onClick={() => setMobileTab("chat")}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+              mobileTab === "chat"
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted"
+            }`}
+          >
+            💬 Chat
+          </button>
+        </div>
+
         <div className="flex-1 flex min-h-0 overflow-hidden">
-          <div className="w-[55%] overflow-y-auto animate-slide-from-left border-r border-outline-variant">
+          {/* Book detail panel — full width on mobile if active, 55% on desktop always */}
+          <div
+            className={`overflow-y-auto animate-slide-from-left md:border-r md:border-outline-variant md:w-[55%] ${
+              mobileTab === "book" ? "w-full" : "hidden md:block"
+            }`}
+          >
             {children}
           </div>
-          <div className="w-[45%] min-h-0 flex flex-col">
+          {/* Chat panel */}
+          <div
+            className={`min-h-0 flex flex-col md:w-[45%] ${
+              mobileTab === "chat" ? "w-full" : "hidden md:flex"
+            }`}
+          >
             <ChatPanel moodChips={moodChips} bookContext={currentBook || undefined} />
           </div>
         </div>
@@ -108,13 +143,13 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
       <div className={`fixed bottom-0 left-0 right-0 z-40 transition-all duration-400 ease-out ${chatExpanded ? "top-16 bg-background" : ""}`}>
         {chatExpanded && (
           <div className="h-full flex flex-col max-w-[800px] mx-auto">
-            <div className="flex items-center justify-between px-6 py-3 shrink-0">
-              <span className="text-sm text-muted font-display">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 shrink-0">
+              <span className="text-sm text-muted font-display truncate pr-4">
                 {currentBook ? `Discussing ${currentBook.title}` : "Chat"}
               </span>
               <button
                 onClick={() => setChatExpanded(false)}
-                className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-muted hover:text-on-surface transition-all duration-200"
+                className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-muted hover:text-on-surface transition-all duration-200 shrink-0"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 9l-7 7-7-7" /></svg>
               </button>
@@ -123,19 +158,19 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
         {!chatExpanded && (
-          <div className="glass-strong pb-6 pt-3 px-6">
+          <div className="glass-strong pb-4 sm:pb-6 pt-3 px-4 sm:px-6">
             <div className="max-w-[800px] mx-auto">
               <button
                 onClick={() => setChatExpanded(true)}
-                className="w-full flex items-center gap-3 glass rounded-full px-5 py-3.5 glow-input hover:shadow-ambient transition-all duration-300 text-left"
+                className="w-full flex items-center gap-2 sm:gap-3 glass rounded-full px-4 sm:px-5 py-3 sm:py-3.5 glow-input hover:shadow-ambient transition-all duration-300 text-left"
               >
                 <svg className="w-5 h-5 text-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
-                <span className="text-muted text-[15px]">Ask about a book, a mood, an author…</span>
-                <div className="ml-auto w-9 h-9 rounded-full gradient-brand flex items-center justify-center shrink-0">
+                <span className="text-muted text-sm sm:text-[15px] truncate">Ask about a book, a mood, an author…</span>
+                <div className="ml-auto w-8 h-8 sm:w-9 sm:h-9 rounded-full gradient-brand flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 text-on-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
                 </div>
               </button>
-              <p className="text-xs text-muted/50 text-center mt-2">BetweenPages only discusses books.</p>
+              <p className="text-[10px] sm:text-xs text-muted/50 text-center mt-2">BetweenPages only discusses books.</p>
             </div>
           </div>
         )}

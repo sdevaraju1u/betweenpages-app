@@ -57,8 +57,8 @@ export default function BookCarousel({
   return (
     <section className="relative group/carousel">
       {/* Section header */}
-      <div className="flex items-center justify-between mb-5 px-8">
-        <h2 className="font-display text-xl font-medium text-on-surface tracking-[-0.01em]">
+      <div className="flex items-center justify-between mb-4 sm:mb-5 px-4 sm:px-8">
+        <h2 className="font-display text-lg sm:text-xl font-medium text-on-surface tracking-[-0.01em]">
           {emoji && <span className="mr-2">{emoji}</span>}
           {title}
         </h2>
@@ -109,7 +109,7 @@ export default function BookCarousel({
         {/* Scrollable track */}
         <div
           ref={scrollRef}
-          className="flex gap-5 overflow-x-auto px-8 pb-4 snap-x snap-mandatory
+          className="flex gap-3 sm:gap-5 overflow-x-auto px-4 sm:px-8 pb-4 snap-x snap-mandatory
             scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >

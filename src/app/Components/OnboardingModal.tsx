@@ -59,11 +59,11 @@ export default function OnboardingModal({ onComplete, initialPreferences, editMo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in" />
-      <div className="relative w-full max-w-2xl mx-4 bg-surface-container-lowest rounded-3xl shadow-[0_24px_80px_rgba(15,31,18,0.12)] overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] sm:mx-4 bg-surface-container-lowest sm:rounded-3xl shadow-[0_24px_80px_rgba(15,31,18,0.12)] overflow-hidden animate-scale-in flex flex-col">
         <div className="h-1 bg-surface-container">
           <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} />
         </div>
-        <div className="px-8 py-10 min-h-[480px] flex flex-col">
+        <div className="px-5 sm:px-8 py-6 sm:py-10 min-h-[480px] flex-1 flex flex-col overflow-y-auto">
           <div key={step} className={`flex-1 ${slideDir === "left" ? "animate-slide-left" : "animate-slide-right"}`}>
             {step === 1 && <StepGenres selected={genres} onToggle={(g) => toggle(genres, setGenres, g)} />}
             {step === 2 && <StepLanguages selected={languages} onToggle={(l) => toggle(languages, setLanguages, l)} />}
@@ -91,7 +91,7 @@ export default function OnboardingModal({ onComplete, initialPreferences, editMo
 function StepGenres({ selected, onToggle }: { selected: string[]; onToggle: (g: string) => void }) {
   return (
     <>
-      <h2 className="font-display text-3xl font-medium text-on-surface tracking-[-0.02em]">What genres do you love?</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-medium text-on-surface tracking-[-0.02em]">What genres do you love?</h2>
       <p className="text-muted mt-2 mb-8">Pick at least 3 — we&apos;ll curate your feed around these.</p>
       <div className="flex flex-wrap gap-3">
         {GENRES.map((genre) => (
@@ -106,7 +106,7 @@ function StepGenres({ selected, onToggle }: { selected: string[]; onToggle: (g: 
 function StepLanguages({ selected, onToggle }: { selected: string[]; onToggle: (l: string) => void }) {
   return (
     <>
-      <h2 className="font-display text-3xl font-medium text-on-surface tracking-[-0.02em]">What languages do you read in?</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-medium text-on-surface tracking-[-0.02em]">What languages do you read in?</h2>
       <p className="text-muted mt-2 mb-8">Pick at least 1.</p>
       <div className="flex flex-wrap gap-3">
         {LANGUAGES.map(({ code, label }) => (
@@ -120,7 +120,7 @@ function StepLanguages({ selected, onToggle }: { selected: string[]; onToggle: (
 function StepCountries({ selected, onToggle }: { selected: string[]; onToggle: (c: string) => void }) {
   return (
     <>
-      <h2 className="font-display text-3xl font-medium text-on-surface tracking-[-0.02em]">Which country charts to follow?</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-medium text-on-surface tracking-[-0.02em]">Which country charts to follow?</h2>
       <p className="text-muted mt-2 mb-8">See what&apos;s trending around the world.</p>
       <div className="flex flex-wrap gap-3">
         {COUNTRIES.map(({ code, label, flag }) => (
@@ -134,9 +134,9 @@ function StepCountries({ selected, onToggle }: { selected: string[]; onToggle: (
 function StepBookClubs({ selected, onToggle }: { selected: string[]; onToggle: (b: string) => void }) {
   return (
     <>
-      <h2 className="font-display text-3xl font-medium text-on-surface tracking-[-0.02em]">Follow your favorite book clubs</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-medium text-on-surface tracking-[-0.02em]">Follow your favorite book clubs</h2>
       <p className="text-muted mt-2 mb-8">Get recommendations from curators you trust.</p>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {BOOK_CLUBS.map(({ id, name, curator, emoji, count }) => (
           <button key={id} onClick={() => onToggle(id)} className={`flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-200 active:scale-[0.98] ${selected.includes(id) ? "bg-primary/10 ring-2 ring-primary" : "bg-surface-container-low hover:bg-surface-container"}`}>
             <span className="text-3xl">{emoji}</span>
